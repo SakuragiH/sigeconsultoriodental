@@ -1,0 +1,235 @@
+:root {
+    --primary-color: #36808B;
+    --secondary-color: #5DA6A6;
+    --dark-color: #12403B;
+    --light-color: #BFBFBF;
+    --text-dark: #1A1D22;
+    --sidebar-width: 250px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+    color: var(--text-dark);
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 25px;
+    background: linear-gradient(to top, var(--secondary-color), var(--dark-color));
+    color: var(--light-color);
+    box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--light-color);
+    padding: 30px 10px;
+    width: 90%;
+    border-radius: 15px;
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+}
+.sidebar-header:hover,
+.sidebar-header.active {
+    background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+    transform: scale(1.05);
+}
+
+/* MENU */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+}
+.sidebar-menu li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--light-color);
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+.sidebar-menu li a i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+.sidebar-menu li a:hover,
+.sidebar-menu li.active a {
+    background-color: var(--secondary-color);
+    color: var(--dark-color);
+    transform: translateX(5px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* TOP BAR */
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to right, var(--secondary-color), var(--dark-color));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    z-index: 10;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.top-bar h2 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: white;
+}
+.logout-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.logout-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    margin-top: 60px;
+    padding: 20px;
+}
+
+/* Tarjeta de perfil */
+.card-hover {
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    border-radius: 12px;
+}
+.card-hover:hover {
+    transform: scale(1.03);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* Info campos perfil */
+.info-field {
+    background-color: rgba(255,255,255,0.15);
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+/* Botón editar perfil */
+.btn-sm {
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+.btn-sm:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Dashboard cards */
+.hover-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border-radius: 12px;
+}
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+.hover-card i {
+    margin-bottom: 10px;
+}
+.hover-card h5, .hover-card p {
+    color: #fff;
+}
+
+/* Citas cards */
+.cita-card {
+    border-radius: 12px;
+    color: #fff;
+    font-size: 0.9rem;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.cita-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+.cita-pendiente {
+    background: linear-gradient(135deg, #36808B, #5DA6A6);
+}
+.cita-confirmada {
+    background: linear-gradient(135deg, #12403B, #36808B);
+}
+.cita-cancelada {
+    background: linear-gradient(135deg, #1A1D22, #BFBFBF);
+}
+.cita-card .card-body p,
+.cita-card .card-body h6 {
+    margin-bottom: 4px;
+}
+
+/* Responsivo */
+@media (max-width: 767px) {
+    .hover-card, .card-hover {
+        margin-bottom: 15px;
+    }
+    .card-hover {
+        flex-direction: column;
+        align-items: center;
+    }
+    .card-hover img {
+        margin-bottom: 15px;
+    }
+    .sidebar { width: 70px; }
+    .sidebar-header { font-size: 1.5rem; padding: 20px 5px; width: 90%; }
+    .sidebar-menu li a span { display: none; }
+    .top-bar { left: 70px; }
+    .main-content { margin-left: 70px; }
+}
+

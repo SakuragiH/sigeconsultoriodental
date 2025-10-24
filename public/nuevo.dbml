@@ -1,0 +1,135 @@
+// =======================
+// Tabla Pacientes
+// =======================
+Table users {
+    id integer [primary key, increment]
+    username varchar(255) [not null, unique]           // Nombre de usuario
+    email varchar(255) [not null, unique]              // Correo para login
+    password varchar(255)                               // Contraseña encriptada (null si usa Google)                          // Última actividad (para timeout)
+}
+
+Table pacientes {
+    id int [pk, increment]
+    user_id integer [not null, ref: > users.id]
+    nombres varchar
+    apellidos varchar
+    ci varchar
+    fecha_nacimiento date
+    telefono varchar
+    genero varchar
+    direccion varchar
+    foto varchar
+    email varchar
+}
+
+// =======================
+// Tabla Odontologos
+// =======================
+Table odontologos {
+    id int [pk, increment]
+    user_id integer [not null, ref: > users.id] 
+    nombres varchar
+    apellidos varchar
+    telefono varchar
+    especialidad varchar
+    formacion varchar
+    foto varchar
+    email varchar
+}
+
+// =======================
+// Tabla Servicios
+// =======================
+Table servicios {
+    id int [pk, increment]
+    nombre varchar
+    precio decimal
+    descripcion text
+    created_at timestamp
+    updated_at timestamp
+}
+
+// =======================
+// Tabla Horarios
+// =======================
+Table horarios {
+    id int [pk, increment]
+    odontologo_id int [ref: > odontologos.id]
+    dia date
+    hora_inicio time
+    hora_fin time
+    disponible boolean
+    created_at timestamp
+    updated_at timestamp
+}
+
+// =======================
+// Tabla Citas
+// =======================
+Table citas {
+    id int [pk, increment]
+    paciente_id int [ref: > pacientes.id]
+    odontologo_id int [ref: > odontologos.id]
+    servicio_id int [ref: > servicios.id]
+    horario_id int [ref: > horarios.id]
+    motivo text
+    observaciones text
+    estado enum('Pendiente','Confirmada','Cancelada')
+    created_at timestamp
+    updated_at timestamp
+}
+
+// =======================
+// Tabla Historial Medico
+// =======================
+Table historial_medico {
+    id int [pk, increment]
+    cita_id int [ref: > citas.id, null]
+    paciente_id int [ref: > pacientes.id, null]
+    diagnostico text
+    tratamiento text
+    observaciones_paciente text
+    created_at timestamp
+    updated_at timestamp
+}
+
+// =======================
+// Tabla Medicamentos
+// =======================
+Table medicamentos {
+    id int [pk, increment]
+    nombre varchar
+    dosis_estandar varchar
+    descripcion text
+    created_at timestamp
+    updated_at timestamp
+}
+
+// =======================
+// Tabla Prescripciones
+// =======================
+Table prescripciones {
+    id int [pk, increment]
+    historial_id int [ref: > historial_medico.id]
+    medicamento_id int [ref: > medicamentos.id]
+    dosis varchar
+    observaciones text
+    created_at timestamp
+    updated_at timestamp
+}
+
+// =======================
+// Relaciones adicionales
+// =======================
+
+// Cita → Historial (1:1)
+Ref: citas.id < historial_medico.cita_id
+
+// Paciente → Historial (1:N)
+Ref: pacientes.id < historial_medico.paciente_id
+
+// Historial → Prescripciones (1:N)
+Ref: historial_medico.id < prescripciones.historial_id
+
+// Medicamento → Prescripciones (1:N)
+Ref: medicamentos.id < prescripciones.medicamento_id

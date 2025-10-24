@@ -1,0 +1,101 @@
+Table users {
+    id integer [primary key, increment]
+    username varchar(255) [not null, unique]           // Nombre de usuario
+    email varchar(255) [not null, unique]              // Correo para login
+    password varchar(255)                               // Contraseña encriptada (null si usa Google)                          // Última actividad (para timeout)
+}
+
+Table pacientes {
+    id integer [primary key, increment]
+    user_id integer [not null, ref: > users.id]        // Relación con la cuenta de usuario
+    nombre varchar(255) [not null]                           
+    apellido varchar(255) [not null]
+    ci varchar(100) [unique]
+    fecha_nacimiento date
+    genero varchar(50)
+    telefono varchar(20)
+    direccion text                         // Ruta de historial médico subido (opcional)
+}
+
+Table odontologos {
+    id integer [primary key, increment]
+    user_id integer [not null, ref: > users.id]        // Relación con usuario (login)
+    nombres varchar(255) [not null]
+    apellidos varchar(255) [not null]
+    especialidad varchar(100)
+    formacion varchar(255)
+    telefono varchar(20)
+    foto varchar(255)
+    estado varchar(50) [default: 'activo'] // 'activo' o 'inactivo'
+}
+
+Table historiales_medicos {
+    id integer [primary key, increment]
+    paciente_id integer [not null, ref: > pacientes.id]
+    descripcion text
+    fecha timestamp [default: `now()`]
+}
+
+Table tratamientos {
+    id integer [primary key, increment]
+    historial_medico_id integer [not null, ref: > historiales_medicos.id]
+    nombre varchar(255) [not null]
+    descripcion text
+    fecha_inicio date
+    fecha_fin date
+}
+
+Table medicamentos {
+    id integer [primary key, increment]
+    nombre varchar(255) [not null]
+    descripcion text
+    dosis varchar(100)
+    frecuencia varchar(100)
+}
+
+Table prescripciones {
+    id integer [primary key, increment]
+    tratamiento_id integer [not null, ref: > tratamientos.id]
+    medicamento_id integer [not null, ref: > medicamentos.id]
+    dosis varchar(100)
+    frecuencia varchar(100)
+    duracion varchar(100)
+}
+
+Table citas {
+    id integer [primary key, increment]
+    paciente_id integer [not null, ref: > pacientes.id]
+    odontologo_id integer [not null, ref: > odontologos.id]
+    fecha_hora timestamp [not null]
+    servicio varchar(255)
+    motivo text
+    estado varchar(50) [not null, default: 'pendiente'] // 'pendiente', 'confirmada', 'cancelada', 'realizada'
+}
+
+Table horarios_medicos {
+    id integer [primary key, increment]
+    odontologo_id integer [not null, ref: > odontologos.id]
+    dia_semana varchar(20) [not null]
+    hora_inicio time [not null]
+    hora_fin time [not null]
+}
+
+Table servicios {
+    id integer [primary key, increment]
+    odontologo_id integer [not null, ref: > odontologos.id]
+    nombre varchar(255) [not null]
+    descripcion text
+    precio decimal(10,2)
+    duracion varchar(50)
+    imagen varchar(255)
+    estado varchar(50) [default: 'activo'] // 'activo' o 'inactivo'
+}
+
+Table reportes {
+    id integer [primary key, increment]
+    paciente_id integer [not null, ref: > pacientes.id]
+    odontologo_id integer [not null, ref: > odontologos.id]
+    tipo varchar(50) [not null]  // 'prescripcion', 'historial', 'tratamiento'
+    descripcion text
+    fecha timestamp [default: `now()`]
+}
