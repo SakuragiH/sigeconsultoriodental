@@ -19,7 +19,7 @@
                             <option value="">Seleccione un historial</option>
                             @foreach($historiales as $historial)
                                 <option value="{{ $historial->id }}">
-                                    {{ $historial->cita->paciente->nombreCompleto() ?? 'Sin paciente' }} |
+                                   {{ $historial->cita && $historial->cita->paciente ? $historial->cita->paciente->nombreCompleto() : 'Sin paciente' }} |
                                     {{ $historial->diagnostico ?? 'Sin diagnóstico' }}
                                 </option>
                             @endforeach

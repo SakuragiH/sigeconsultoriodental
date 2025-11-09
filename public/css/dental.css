@@ -52,12 +52,13 @@ body {
     transform: translateX(5px);
 }
 
-/* Cards */
+/* Cards base */
 .service-card {
     background-color: #5DA6A6;
     color: #1A1D22;
     border-radius: 20px;
-    padding: 20px;
+    overflow: hidden;
+    padding: 0;
     box-shadow: 0 6px 15px rgba(0,0,0,0.15);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -65,6 +66,29 @@ body {
 .service-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+}
+
+/* 🖼️ Imágenes uniformes en las tarjetas */
+.service-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Contenido interno */
+.service-card .p-3 {
+    padding: 1rem;
+}
+
+.service-card h5 {
+    font-weight: 700;
+    color: #12403B;
+}
+
+.service-card p {
+    color: #1A1D22;
+    line-height: 1.5;
 }
 
 /* Títulos */
@@ -139,7 +163,7 @@ footer a:hover {
     border: 3px solid #36808B;
 }
 
-/* Hover efectos */
+/* Hover efecto en imágenes */
 .service-card img:hover {
     transform: scale(1.05);
     transition: transform 0.4s ease;
@@ -150,17 +174,18 @@ footer a:hover {
     .service-card { margin-bottom:20px; }
 }
 
+/* Carrusel */
 .carousel-border {
-    border-radius: 20px; /* Bordes redondeados */
-    padding: 4px; /* Espacio para el borde */
-    background: linear-gradient(to right, #36808B, #5DA6A6, #12403B); /* Borde degradado */
+    border-radius: 20px;
+    padding: 4px;
+    background: linear-gradient(to right, #36808B, #5DA6A6, #12403B);
 }
 #carouselConsultorio {
-    border-radius: 16px; /* Mantener esquinas redondeadas dentro del contenedor */
+    border-radius: 16px;
     overflow: hidden;
 }
 
-/* Ocultar las flechas del carrusel */
+/* Ocultar flechas del carrusel */
 #carouselConsultorio .carousel-control-prev,
 #carouselConsultorio .carousel-control-next {
     display: none;
@@ -168,21 +193,22 @@ footer a:hover {
 
 /* Contenedor principal */
 .dental-home {
-    margin-top: 1rem; /* antes estaba my-5, ahora solo 1rem */
-    margin-bottom: 2rem; /* opcional */
+    margin-top: 1rem;
+    margin-bottom: 2rem;
 }
 
+/* 🌟 Hero principal */
 .hero-title {
     background: linear-gradient(
         135deg,
-        rgba(54, 128, 139, 0.9), /* #36808B */
-        rgba(93, 166, 166, 0.9), /* #5DA6A6 */
-        rgba(18, 64, 59, 0.9),   /* #12403B */
-        rgba(26, 29, 34, 0.9)    /* #1A1D22 */
+        rgba(54, 128, 139, 0.9),
+        rgba(93, 166, 166, 0.9),
+        rgba(18, 64, 59, 0.9),
+        rgba(26, 29, 34, 0.9)
     );
     border-radius: 12px;
     color: white;
-    padding: 0.8rem 1.2rem; /* Menos alto y ancho */
+    padding: 0.8rem 1.2rem;
     margin-bottom: 1rem;
     width: 100%;
     text-align: center;
@@ -190,13 +216,13 @@ footer a:hover {
 }
 
 .hero-title:hover {
-    transform: scale(1.03) translateY(-2px); /* Efecto hover más sutil */
+    transform: scale(1.03) translateY(-2px);
     box-shadow: 0 6px 15px rgba(0,0,0,0.3);
 }
 
 .hero-title h1 {
     margin-bottom: 0.2rem;
-    font-size: 1.8rem; /* Más compacto */
+    font-size: 1.8rem;
 }
 
 .hero-title p {
@@ -207,21 +233,16 @@ footer a:hover {
 
 .hero-title .chatbot-prompt {
     font-weight: 600;
-    font-size: 0.95rem; /* Más pequeño y discreto */
+    font-size: 0.95rem;
     color: #FFFFFF;
     margin-top: 0.3rem;
 }
 
-/* 💬 ChatBot Card con degradado más oscuro y paleta refinada */
+/* 💬 ChatBot Card */
 .chatbot-card {
-    background: linear-gradient(
-        145deg,
-        #12403B 0%,     /* Oscuro predominante */
-        #36808B 45%,    /* Medio */
-        #5DA6A6 100%    /* Claro al final */
-    );
+    background: linear-gradient(145deg, #12403B 0%, #36808B 45%, #5DA6A6 100%);
     border-radius: 15px;
-    color: #FFFFFF; /* Texto blanco para contraste */
+    color: #FFFFFF;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -231,7 +252,6 @@ footer a:hover {
     box-shadow: 0 6px 20px rgba(0,0,0,0.25);
 }
 
-/* Hover con efecto más notorio */
 .chatbot-card:hover {
     transform: scale(1.02);
     box-shadow: 0 10px 25px rgba(0,0,0,0.4);
@@ -247,7 +267,7 @@ footer a:hover {
 
 .chatbot-header p {
     font-size: 0.85rem;
-    color: #E8F9F9; /* Blanco suave */
+    color: #E8F9F9;
 }
 
 /* 🗨️ Cuerpo del chat */
@@ -304,7 +324,7 @@ footer a:hover {
     padding: 2rem 2.5rem;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin-top: 2.5rem; /* 🔹 Espacio entre el carrusel y servicios */
+    margin-top: 2.5rem;
 }
 
 .service-box:hover {
@@ -312,7 +332,6 @@ footer a:hover {
     box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
 }
 
-/* Título */
 .service-box h2 {
     font-size: 1.8rem;
     font-weight: 700;
@@ -320,18 +339,69 @@ footer a:hover {
     color: #FFFFFF;
 }
 
-/* Párrafo */
 .service-box p {
     font-size: 1rem;
     font-weight: 400;
     color: #EAF6F6;
 }
 
+/* 🌟 Animación de aparición suave */
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-    
+/* Aplica la animación al cargar */
+.hero-title,
+.chatbot-card,
+.service-box,
+.service-card {
+    opacity: 0;
+    animation: fadeInUp 0.9s ease forwards;
+}
 
+/* Pequeños retrasos para que aparezcan uno tras otro */
+.hero-title {
+    animation-delay: 0.1s;
+}
+.chatbot-card {
+    animation-delay: 0.3s;
+}
+.service-box {
+    animation-delay: 0.5s;
+}
+.service-card:nth-child(1) { animation-delay: 0.6s; }
+.service-card:nth-child(2) { animation-delay: 0.8s; }
+.service-card:nth-child(3) { animation-delay: 1s; }
 
+/* En móviles, aparece más rápido */
+@media (max-width: 768px) {
+    .hero-title,
+    .chatbot-card,
+    .service-box,
+    .service-card {
+        animation-duration: 0.7s;
+        animation-delay: 0s;
+    }
+}
+.advantage-icon {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    transition: transform 0.3s ease;
+}
 
-
+.service-card:hover .advantage-icon {
+    transform: scale(1.1);
+}
 
 

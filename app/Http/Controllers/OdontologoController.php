@@ -6,6 +6,7 @@ use App\Models\Odontologo;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
 class OdontologoController extends Controller
@@ -74,12 +75,17 @@ class OdontologoController extends Controller
             $odontologo->formacion = $request->formacion;
             
             // Manejo de la subida de la foto
-            $foto = $request->file('foto');
-            $nombreArchivo = time().'_'.$foto->getClientOriginalName();
-            $rutaDestino = public_path('uploads/fotos_odontologos');
-            $foto->move($rutaDestino, $nombreArchivo);
-            $fotopath = 'uploads/fotos_odontologos/'.$nombreArchivo;
-            $odontologo->foto = $fotopath;
+            if ($request->hasFile('foto')) {
+                $foto = $request->file('foto');
+                $nombreArchivo = time() . '_' . $foto->getClientOriginalName();
+
+                // Guardar en storage/app/public/odontologos
+                $foto->storeAs('public/odontologos', $nombreArchivo);
+
+                // Guardar solo el nombre del archivo en la BD
+                $odontologo->foto = $nombreArchivo;
+            }
+
 
             $odontologo->save();
 
@@ -144,20 +150,24 @@ class OdontologoController extends Controller
         $odontologo->especialidad = $request->especialidad;
         $odontologo->formacion = $request->formacion;
 
-        // Manejo de foto
+        // Manejo de la foto
         if ($request->hasFile('foto')) {
             // Eliminar foto anterior si existe
-            if ($odontologo->foto && file_exists(public_path($odontologo->foto))) {
-                unlink(public_path($odontologo->foto));
+            if ($odontologo->foto && Storage::exists('public/odontologos/'.$odontologo->foto)) {
+                Storage::delete('public/odontologos/'.$odontologo->foto);
             }
 
             // Subir nueva foto
             $foto = $request->file('foto');
             $nombreArchivo = time() . '_' . $foto->getClientOriginalName();
-            $rutaDestino = public_path('uploads/fotos_odontologos');
-            $foto->move($rutaDestino, $nombreArchivo);
-            $odontologo->foto = 'uploads/fotos_odontologos/' . $nombreArchivo;
+
+            // Guardar en storage/app/public/odontologos
+            $foto->storeAs('public/odontologos', $nombreArchivo);
+
+            // Guardar solo el nombre del archivo en la BD
+            $odontologo->foto = $nombreArchivo;
         }
+
 
         $odontologo->save();
 
@@ -175,10 +185,11 @@ class OdontologoController extends Controller
         $odontologo = Odontologo::find($id);
         $usuario = User::find($odontologo->usuario_id);
 
-        // Eliminar foto si existe
-        if ($odontologo->foto && file_exists(public_path($odontologo->foto))) {
-            unlink(public_path($odontologo->foto));
+       // Eliminar foto si existe en storage
+        if ($odontologo->foto && Storage::exists('public/odontologos/'.$odontologo->foto)) {
+            Storage::delete('public/odontologos/'.$odontologo->foto);
         }
+
 
         // Eliminar odontólogo y usuario asociado
         $odontologo->delete();

@@ -80,14 +80,29 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="horario_id" class="form-label">Horario</label>
-                    <select class="form-select" id="horario_id" name="horario_id" required>
-                        <option value="">Seleccione un odontólogo primero</option>
+                    <label for="filtro_fecha" class="form-label">Buscar horarios disponibles de:</label>
+                    <select id="filtro_fecha" class="form-select">
+                        <option value="hoy">Hoy</option>
+                        <option value="manana">Mañana</option>
+                        <option value="semana_actual">Semana actual</option>
+                        <option value="semana_siguiente">Semana siguiente</option>
+                        <option value="este_mes">Este mes</option>
+                        <option value="proximo_mes">Próximo mes</option>
                     </select>
+                </div>
+
+
+                <div class="col-md-12">
+                    <label class="form-label">Horarios Disponibles</label>
+                    <div id="lista_horarios" class="row g-2">
+                        <p class="text-muted">Seleccione un odontólogo primero</p>
+                    </div>
+                    <input type="hidden" name="horario_id" id="horario_id" required>
                     @error('horario_id')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
+
 
                 <div class="col-md-4">
                     <label for="servicio_id" class="form-label">Servicio</label>
@@ -120,38 +135,66 @@
 
 {{-- Script para cargar horarios --}}
 <script>
-document.getElementById('odontologo_id').addEventListener('change', function () {
-    const odontologoId = this.value;
-    const horarioSelect = document.getElementById('horario_id');
+document.getElementById('odontologo_id').addEventListener('change', cargarHorarios);
+document.getElementById('filtro_fecha').addEventListener('change', cargarHorarios);
 
-    horarioSelect.innerHTML = '<option value="">Cargando...</option>';
+function cargarHorarios() {
+    const odontologoId = document.getElementById('odontologo_id').value;
+    const filtro = document.getElementById('filtro_fecha').value;
+    const contenedor = document.getElementById('lista_horarios');
+    const inputHidden = document.getElementById('horario_id');
+
+    contenedor.innerHTML = '<p class="text-muted">Cargando horarios...</p>';
+    inputHidden.value = '';
 
     if (!odontologoId) {
-        horarioSelect.innerHTML = '<option value="">Seleccione un odontólogo primero</option>';
+        contenedor.innerHTML = '<p class="text-muted">Seleccione un odontólogo primero</p>';
         return;
     }
 
-    fetch(`/usuario/api/odontologos/${odontologoId}/horarios-disponibles`)
+    fetch(`/usuario/api/odontologos/${odontologoId}/horarios-disponibles?filtro=${filtro}`)
         .then(res => res.json())
         .then(data => {
-            horarioSelect.innerHTML = '';
+            contenedor.innerHTML = '';
             if (data.length === 0) {
-                horarioSelect.innerHTML = '<option value="">Sin horarios disponibles</option>';
-            } else {
-                data.forEach(h => {
-                    const option = document.createElement('option');
-                    // Mostramos fecha + hora_inicio
-                    option.value = h.id;
-                    option.textContent = `${h.dia} | ${h.fecha_formateada} | ${h.hora_inicio} - ${h.hora_fin}`;
-                    horarioSelect.appendChild(option);
-                });
+                contenedor.innerHTML = '<p class="text-muted">Sin horarios disponibles</p>';
+                return;
             }
+
+            data.forEach(dia => {
+                const col = document.createElement('div');
+                col.classList.add('col-12', 'mb-3');
+
+                let html = `<div class="card p-3 shadow-sm">
+                                <h5 class="mb-2 text-primary">${dia.dia} - ${dia.fecha}</h5>
+                                <div class="d-flex flex-wrap gap-2">`;
+
+                dia.bloques.forEach(h => {
+                    html += `<button type="button" class="btn btn-outline-success horario-btn" data-id="${h.id}">
+                                ${h.hora_inicio} - ${h.hora_fin}
+                             </button>`;
+                });
+
+                html += `</div></div>`;
+                col.innerHTML = html;
+                contenedor.appendChild(col);
+            });
+
+            document.querySelectorAll('.horario-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    inputHidden.value = e.target.dataset.id;
+                });
+            });
         })
         .catch(() => {
-            horarioSelect.innerHTML = '<option value="">Error al cargar horarios</option>';
+            contenedor.innerHTML = '<p class="text-danger">Error al cargar horarios</p>';
         });
-});
+}
+
 </script>
+
 
 {{-- SweetAlert2 --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -184,5 +227,16 @@ document.getElementById('odontologo_id').addEventListener('change', function () 
     transform: scale(1.02);
     box-shadow: 0 6px 15px rgba(0,0,0,0.15);
 }
+
+.horario-btn {
+    border-radius: 10px;
+    padding: 8px 14px;
+    transition: all 0.2s ease;
+}
+.horario-btn.active {
+    background-color: #12403B !important;
+    color: white !important;
+}
 </style>
+
 @endsection

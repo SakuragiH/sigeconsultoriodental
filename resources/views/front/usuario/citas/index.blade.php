@@ -4,6 +4,18 @@
 <div class="container mt-5">
     <h2>Mis Citas</h2>
 
+    <!-- Mostrar alerta si el usuario aún no es paciente -->
+    @if($noPaciente)
+    <script>
+    Swal.fire({
+        icon: 'info',
+        title: 'Aún no tienes citas',
+        text: 'Debes agendar tu primera cita para registrarte como paciente.',
+        confirmButtonColor: '#12403B'
+    });
+    </script>
+    @endif
+
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @if(session('success'))

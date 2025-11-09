@@ -21,7 +21,7 @@ return new class extends Migration
 
             $table->text('motivo')->nullable();
             $table->text('observaciones')->nullable();
-            $table->enum('estado', ['Pendiente', 'Confirmada', 'Cancelada'])->default('Pendiente');
+            $table->enum('estado', ['Pendiente', 'Confirmada', 'Cancelada','Realizada'])->default('Pendiente');
 
             $table->timestamps();
         });

@@ -82,6 +82,14 @@
             </div>
         </div>
     </form>
+        {{-- Login con Google --}}
+    <div class="social-auth-links text-center mt-3">
+        <p>- O inicia sesión con -</p>
+        <a href="{{ route('google.login') }}" class="btn btn-block btn-danger">
+            <i class="fab fa-google mr-2"></i> Iniciar sesión con Google
+        </a>
+    </div>
+
 @stop
 
 @section('auth_footer')

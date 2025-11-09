@@ -13,14 +13,13 @@ class HistorialMedicoController extends Controller
     public function index()
     {
 
-         // Traemos los historiales con la cita y sus relaciones necesarias
-    $historiales = HistorialMedico::with([
-            'cita.servicio',  // Relación con Servicio
-            'cita.horario',   // Relación con Horario
-            'cita.paciente'   // Relación con Paciente
-        ])
-        ->orderBy('created_at', 'desc')
-        ->get();
+         $historiales = HistorialMedico::with([
+        'cita' => function($query) {
+            $query->with(['servicio', 'horario', 'paciente']);
+        }
+    ])
+    ->orderBy('created_at', 'desc')
+    ->get();
 
     return view('front.odontologo.historialesmedicos.index', compact('historiales'));
     

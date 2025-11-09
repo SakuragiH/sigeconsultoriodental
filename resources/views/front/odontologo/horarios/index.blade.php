@@ -31,8 +31,8 @@
             <tr>
                 <td>{{ $horario->dia }}</td>
                 <td>{{ $horario->fecha }}</td>
-                <td>{{ $horario->hora_inicio }}</td>
-                <td>{{ $horario->hora_fin }}</td>
+                <td>{{ \Carbon\Carbon::parse($horario->hora_inicio)->format('h:i A') }}</td>
+                <td>{{ \Carbon\Carbon::parse($horario->hora_fin)->format('h:i A') }}</td>
                 <td>
                     @if($horario->disponible)
                         <span class="badge" style="background-color:#36808B; color:#ffffff;">Sí</span>
@@ -41,7 +41,6 @@
                     @endif
                 </td>
                 <td>
-                    <!-- Editar -->
                     <a href="{{ route('odontologo.horarios.edit', $horario->id) }}" 
                        class="btn btn-sm" 
                        style="background-color:#36808B; color:#ffffff;" 
@@ -49,7 +48,6 @@
                         <i class="fas fa-pen"></i>
                     </a>
 
-                    <!-- Eliminar -->
                     <form action="{{ route('odontologo.horarios.delete', $horario->id) }}" 
                           method="POST" 
                           class="form-delete" 
@@ -78,7 +76,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // Confirmación de eliminar
     document.querySelectorAll('.form-delete').forEach(form => {
         form.addEventListener('submit', function(e){
             e.preventDefault();
@@ -99,7 +96,6 @@
         });
     });
 
-    // Alertas de éxito
     @if(session('success'))
     Swal.fire({
         icon: 'success',
@@ -109,7 +105,6 @@
     });
     @endif
 
-    // Alertas de error
     @if(session('error'))
     Swal.fire({
         icon: 'error',
@@ -119,4 +114,31 @@
     });
     @endif
 </script>
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    $('.table').DataTable({
+        "pageLength": 5,
+        "language": {
+            "emptyTable": "No hay información",
+            "info": "Mostrando _START_ a _END_ de _TOTAL_ horarios",
+            "infoEmpty": "Mostrando 0 a 0 de 0 horarios",
+            "infoFiltered": "(Filtrado de _MAX_ total horarios)",
+            "lengthMenu": "<b>Mostrar _MENU_ horarios</b>",
+            "loadingRecords": "Cargando...",
+            "processing": "Procesando...",
+            "search": "Buscador:",
+            "zeroRecords": "Sin resultados encontrados",
+            "paginate": {
+                "first": "Primero",
+                "last": "Último",
+                "next": "Siguiente",
+                "previous": "Anterior"
+            }
+        }
+    });
+});
+</script>
+@endpush
 @endsection

@@ -54,6 +54,18 @@
                     </div>
                 </div>
 
+                <!-- Disponibilidad -->
+                    <div class="card shadow-sm mb-3" style="border-left: 5px solid #36808B;">
+                        <div class="card-body">
+                            <h6 class="card-title" style="color:#12403B;">Disponible</h6>
+                            <select name="disponible" class="form-control">
+                                <option value="1" {{ old('disponible', $horario->disponible) ? 'selected' : '' }}>Sí</option>
+                                <option value="0" {{ !old('disponible', $horario->disponible) ? 'selected' : '' }}>No</option>
+                            </select>
+                        </div>
+                    </div>
+
+
                 <!-- Botones -->
                 <div class="d-flex justify-content-start mt-3">
                     <button type="submit" 

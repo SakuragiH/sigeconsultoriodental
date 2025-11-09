@@ -40,22 +40,35 @@
         </div>
     </div>
 
-        <!-- ChatBot IA a la derecha -->
-        <div class="col-md-5">
-            <div class="chatbot-card shadow">
-                <div class="chatbot-header">
-                    <h5>Hola </h5>
-                    <p>Soy tu asistente virtual. Escribe aquí tus dudas y agenda tu cita.</p>
-                </div>
-                <div class="chatbot-body" id="chatbot-body">
-                    <!-- Mensajes aparecerán aquí -->
-                </div>
-                <div class="chatbot-input">
-                    <input type="text" id="chatbot-input" placeholder="Escribe tu mensaje..." />
-                    <button id="chatbot-send">Enviar</button>
-                </div>
-            </div>
+        <!-- Cuadro informativo Chatbot IA -->
+<div class="col-md-5">
+    <div class="chatbot-info-card shadow-lg" style="background: linear-gradient(135deg, #12403B, #36808B); color: white; border-radius: 15px; padding: 25px;">
+        <h4 style="color: #FFFFFF; font-weight: 700;">🤖 Asistente Virtual - Alcala’s Dent</h4>
+        <hr style="border-color: rgba(255,255,255,0.2);">
+        <p style="font-size: 15px; line-height: 1.6;">
+            En <strong>Alcala’s Dent</strong> queremos ofrecerte una atención más rápida y personalizada.  
+            Nuestro <strong>chatbot inteligente</strong> está disponible para responder tus dudas sobre:
+        </p>
+
+        <ul style="list-style-type: none; padding-left: 0; margin-top: 10px;">
+            <li style="margin-bottom: 8px;">✅ Horarios de atención</li>
+            <li style="margin-bottom: 8px;">✅ Servicios y precios</li>
+            <li style="margin-bottom: 8px;">✅ Recomendaciones de cuidado dental</li>
+            <li style="margin-bottom: 8px;">✅ Cómo agendar tu cita</li>
+        </ul>
+
+        <div style="background-color: #5DA6A6; padding: 15px; border-radius: 10px; margin-top: 20px;">
+            <h6 style="color: #1A1D22; font-weight: 600;">💡 Beneficios:</h6>
+            <ul style="list-style-type: disc; margin-left: 20px; color: #1A1D22;">
+                <li>Atención disponible las 24 horas.</li>
+                <li>Respuestas rápidas sin esperas.</li>
+                <li>Información clara sobre tratamientos.</li>
+            </ul>
         </div>
+
+    </div>
+</div>
+
 
 
 
@@ -74,7 +87,7 @@
     <div class="row g-4 mb-5">
         <div class="col-md-4">
             <div class="service-card">
-                <img src="{{ asset('images/limpieza.jpg') }}" alt="Limpieza Dental">
+                <img src="{{ asset('images/inicio/limpiezadental.jpg') }}" alt="Limpieza Dental">
                 <div class="p-3">
                     <h5>Limpieza Dental</h5>
                     <p>Realizamos limpiezas profesionales para mantener tu boca saludable y prevenir problemas.</p>
@@ -83,7 +96,7 @@
         </div>
         <div class="col-md-4">
             <div class="service-card">
-                <img src="{{ asset('images/blanqueamiento.jpg') }}" alt="Blanqueamiento">
+                <img src="{{ asset('images/inicio/blanqueamientodental.png') }}" alt="Blanqueamiento">
                 <div class="p-3">
                     <h5>Blanqueamiento Dental</h5>
                     <p>Deja tu sonrisa más brillante con nuestros tratamientos seguros y efectivos.</p>
@@ -92,7 +105,7 @@
         </div>
         <div class="col-md-4">
             <div class="service-card">
-                <img src="{{ asset('images/ortodoncia.jpg') }}" alt="Ortodoncia">
+                <img src="{{ asset('images/inicio/ortodoncia.png') }}" alt="Ortodoncia">
                 <div class="p-3">
                     <h5>Ortodoncia</h5>
                     <p>Mejora la alineación de tus dientes con tratamientos modernos de ortodoncia.</p>
@@ -102,57 +115,37 @@
     </div>
 
     <!-- ✅ Ventajas del consultorio -->
-    <div class="row text-center g-4 mb-5">
-        <div class="col-md-3">
-            <div class="service-card p-4 shadow-sm">
-                <h6>Atención Profesional</h6>
-                <p>Equipo calificado y atento para tu bienestar.</p>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="service-card p-4 shadow-sm">
-                <h6>Equipamiento Moderno</h6>
-                <p>Utilizamos tecnología de punta en todos los tratamientos.</p>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="service-card p-4 shadow-sm">
-                <h6>Ambiente Seguro</h6>
-                <p>Espacios cómodos y esterilizados para tu tranquilidad.</p>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="service-card p-4 shadow-sm">
-                <h6>Horarios Flexibles</h6>
-                <p>Nos adaptamos a tus tiempos y necesidades.</p>
-            </div>
+<div class="row text-center g-4 mb-5">
+    <div class="col-md-3">
+        <div class="service-card p-4 shadow-sm">
+            <img src="{{ asset('images/inicio/atencionprofesional.png') }}" alt="Atención Profesional" class="advantage-icon mb-3">
+            <h6>Atención Profesional</h6>
+            <p>Equipo calificado y atento para tu bienestar.</p>
         </div>
     </div>
+    <div class="col-md-3">
+        <div class="service-card p-4 shadow-sm">
+            <img src="{{ asset('images/inicio/consul3.jpeg') }}" alt="Equipamiento Moderno" class="advantage-icon mb-3">
+            <h6>Equipamiento Moderno</h6>
+            <p>Utilizamos tecnología de punta en todos los tratamientos.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="service-card p-4 shadow-sm">
+            <img src="{{ asset('images/inicio/consul2.jpeg') }}" alt="Ambiente Seguro" class="advantage-icon mb-3">
+            <h6>Ambiente Seguro</h6>
+            <p>Espacios cómodos y esterilizados para tu tranquilidad.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="service-card p-4 shadow-sm">
+            <img src="{{ asset('images/inicio/horarios flexibles.png') }}" alt="Horarios Flexibles" class="advantage-icon mb-3">
+            <h6>Horarios Flexibles</h6>
+            <p>Nos adaptamos a tus tiempos y necesidades.</p>
+        </div>
+    </div>
+</div>
 
-    <!-- 👨‍⚕️ Nuestro equipo (resumido) -->
-    <div class="row text-center g-4 mb-5">
-        <div class="col-md-4">
-            <div class="service-card p-3 shadow-sm">
-                <img src="{{ asset('images/dentista1.jpg') }}" class="rounded-circle mb-2" style="width:100px;height:100px;" alt="Dr. Juan Pérez">
-                <h6>Dr. Juan Pérez</h6>
-                <p>Ortodoncia</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="service-card p-3 shadow-sm">
-                <img src="{{ asset('images/dentista2.jpg') }}" class="rounded-circle mb-2" style="width:100px;height:100px;" alt="Dra. María López">
-                <h6>Dra. María López</h6>
-                <p>Odontología General</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="service-card p-3 shadow-sm">
-                <img src="{{ asset('images/dentista3.jpg') }}" class="rounded-circle mb-2" style="width:100px;height:100px;" alt="Dr. Carlos Díaz">
-                <h6>Dr. Carlos Díaz</h6>
-                <p>Estética Dental</p>
-            </div>
-        </div>
-    </div>
 
 </div>
 

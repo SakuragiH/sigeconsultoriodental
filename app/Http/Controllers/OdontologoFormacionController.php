@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\OdontologoFormacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class OdontologoFormacionController extends Controller
 {
@@ -31,17 +32,16 @@ class OdontologoFormacionController extends Controller
      */
     public function store(Request $request)
     {
-         $request->validate([
+          $request->validate([
             'archivo' => 'required|file|mimes:pdf,jpg,jpeg,png,gif|max:5120',
             'descripcion' => 'nullable|string|max:255',
         ]);
 
         $odontologo = Auth::user()->odontologo;
 
-        // Guardar archivo
+        // Guardar archivo en storage/app/public/formaciones
         $file = $request->file('archivo');
-        $nombreArchivo = time() . '_' . $file->getClientOriginalName();
-        $file->move(public_path('uploads/formaciones'), $nombreArchivo);
+        $nombreArchivo = $file->store('formaciones', 'public');
 
         // Registrar en la base de datos
         OdontologoFormacion::create([
@@ -83,16 +83,15 @@ class OdontologoFormacionController extends Controller
      */
     public function destroy($id)
     {
-        $formacion = OdontologoFormacion::findOrFail($id);
+         $formacion = OdontologoFormacion::findOrFail($id);
 
-        // Eliminar archivo del servidor si existe
-        $ruta = public_path('uploads/formaciones/' . $formacion->archivo);
-        if (file_exists($ruta)) {
-            unlink($ruta);
-        }   
+        // Eliminar archivo del storage si existe
+        if (Storage::disk('public')->exists($formacion->archivo)) {
+            Storage::disk('public')->delete($formacion->archivo);
+        }
 
         $formacion->delete();
 
-        return redirect()->back()->with('success', 'Formación eliminada correctamente.');
-        }
+        return redirect()->back()->with('success', 'Formación eliminada correctamente.'); 
+    }
 }

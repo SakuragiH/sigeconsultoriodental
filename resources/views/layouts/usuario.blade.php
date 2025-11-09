@@ -39,6 +39,12 @@
                     <i class="fas fa-plus-circle"></i> <span>Agendar Cita</span>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('usuario.prescripciones.index') ? 'active' : '' }}">
+                <a href="{{ route('usuario.prescripciones.index') }}">
+                    <i class="fas fa-prescription-bottle-alt"></i> <span>Prescripciones</span>
+                </a>
+            </li>
+
         </ul>
     </aside>
 
@@ -65,7 +71,8 @@
             'usuario.index': 'Inicio',
             'usuario.perfil.editar': 'Tu información',
             'usuario.citas': 'Tus Citas',
-            'usuario.citas.crear': 'Agendar Cita'
+            'usuario.citas.crear': 'Agendar Cita',
+            'usuario.prescripciones.index': 'Prescripciones'
         };
         if (titles[routeName]) moduleTitle.textContent = titles[routeName];
 

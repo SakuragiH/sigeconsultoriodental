@@ -20,7 +20,6 @@
     @else
         <div class="table-responsive">
             <table class="table table-bordered table-striped align-middle">
-                <!-- Encabezado con degradados individuales -->
                 <thead>
                     <tr>
                         <th style="background: linear-gradient(90deg, #36808B, #5DA6A6); color: #fff;">Nro</th>
@@ -38,21 +37,22 @@
 
                             <!-- Cita (incluye paciente, fecha, hora, servicio y motivo) -->
                             <td>
-                                @if($historial->cita)
-                                    @php
-                                        $cita = $historial->cita;
-                                        $horario = $cita->horario;
-                                    @endphp
+                                @php
+                                    $cita = $historial->cita;
+                                @endphp
+
+                                @if($cita)
+                                    @php $horario = $cita->horario; @endphp
 
                                     <strong>Paciente:</strong> 
                                     {{ $cita->paciente->nombreCompleto() ?? ($cita->paciente->nombres ?? 'Sin nombre').' '.($cita->paciente->apellidos ?? '') }} <br>
 
-                                    <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($horario->fecha)->format('d/m/Y') }} <br>
-                                    <strong>Hora:</strong> {{ \Carbon\Carbon::parse($horario->hora_inicio)->format('H:i') }} <br>
+                                    <strong>Fecha:</strong> {{ $horario ? \Carbon\Carbon::parse($horario->fecha)->format('d/m/Y') : 'N/A' }} <br>
+                                    <strong>Hora:</strong> {{ $horario ? \Carbon\Carbon::parse($horario->hora_inicio)->format('H:i') : 'N/A' }} <br>
                                     <strong>Servicio:</strong> {{ $cita->servicio->nombre ?? 'N/A' }} <br>
                                     <strong>Motivo:</strong> {{ $cita->motivo ?? 'Sin motivo' }}
                                 @else
-                                    <em>Sin cita</em>
+                                    <em>Cita eliminada</em>
                                 @endif
                             </td>
 
@@ -110,12 +110,10 @@
     @endif
 </div>
 
-<!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const botones = document.querySelectorAll('.btn-eliminar');
-
     botones.forEach(button => {
         button.addEventListener('click', function() {
             const form = this.closest('form');

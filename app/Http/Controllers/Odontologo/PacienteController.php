@@ -114,10 +114,23 @@ class PacienteController extends Controller
         $q = $request->input('q');
 
         $pacientes = Paciente::where('nombres', 'like', "%$q%")
-            ->orWhere('apellidos', 'like', "%$q%")
-            ->limit(20) // límite para no saturar
-            ->get();
+        ->orWhere('apellidos', 'like', "%$q%")
+        ->orWhere('ci', 'like', "%$q%")
+        ->orWhere('telefono', 'like', "%$q%")
+        ->orWhere('fecha_nacimiento', 'like', "%$q%")
+        ->limit(20)
+        ->get();
+
 
         return response()->json($pacientes);
     }
+
+    public function destroy($id)
+{
+    $paciente = \App\Models\Paciente::findOrFail($id);
+    $paciente->delete();
+
+    return redirect()->route('odontologo.pacientes.index')->with('success', 'Paciente eliminado correctamente.');
+}
+
 }

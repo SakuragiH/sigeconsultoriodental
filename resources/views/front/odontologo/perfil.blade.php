@@ -9,7 +9,6 @@
         <div class="card perfil-card">
             <div class="perfil-foto">
                 @if($odontologo->foto)
-                    {{-- 🔧 Ruta corregida para mostrar desde storage --}}
                     <img src="{{ asset('storage/odontologos/'.$odontologo->foto) }}" alt="Foto Odontólogo">
                 @else
                     <img src="{{ asset('img/default-avatar.png') }}" alt="Foto Odontólogo">
@@ -46,10 +45,9 @@
                             @endphp
 
                             @if(in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif']))
-                                {{-- También actualizamos la ruta a storage --}}
-                                <img src="{{ asset('storage/formaciones/'.$formacion->archivo) }}" alt="Formación">
+                                <img src="{{ asset('storage/'.$formacion->archivo) }}" alt="Formación">
                             @elseif(strtolower($ext) === 'pdf')
-                                <iframe src="{{ asset('storage/formaciones/'.$formacion->archivo) }}" width="100%" height="250px"></iframe>
+                                <iframe src="{{ asset('storage/'.$formacion->archivo) }}" width="100%" height="250px"></iframe>
                             @else
                                 <p>Archivo: {{ $formacion->archivo }}</p>
                             @endif

@@ -98,6 +98,14 @@
             {{ __('adminlte::adminlte.register') }}
         </button>
     </form>
+        {{-- Registro con Google --}}
+        <div class="social-auth-links text-center mt-3">
+            <p>- O regístrate con -</p>
+            <a href="{{ route('google.login') }}" class="btn btn-block btn-danger">
+                <i class="fab fa-google mr-2"></i> Registrarse con Google
+            </a>
+        </div>
+
 @stop
 
 @section('auth_footer')

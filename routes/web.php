@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +22,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->middleware('auth');
 
 
 //rutas para configuracion
@@ -156,6 +158,13 @@ Route::prefix('usuario')->middleware(['auth', 'role:Usuario|Paciente'])->group(f
     Route::get('/api/odontologos/{odontologo}/horarios-disponibles', [App\Http\Controllers\UsuarioFrontController::class,'horariosDisponibles']);
     Route::get('/citas/{cita}', [App\Http\Controllers\UsuarioFrontController::class, 'mostrarCita'])->name('usuario.citas.show');
 
+    Route::get('prescripciones', [App\Http\Controllers\UsuarioFrontController::class, 'prescripciones'])
+        ->name('usuario.prescripciones.index');
+
+    Route::get('prescripciones/{prescripcion}/pdf', [App\Http\Controllers\UsuarioFrontController::class, 'descargarPrescripcion'])
+        ->name('usuario.prescripciones.pdf');
+
+
 });
 
 
@@ -259,15 +268,108 @@ Route::get('/prescripciones/{id}/editar', [App\Http\Controllers\Odontologo\Presc
 Route::put('/prescripciones/{id}', [App\Http\Controllers\Odontologo\PrescripcionController::class, 'update'])->name('odontologo.prescripciones.update');
 Route::delete('/prescripciones/{id}', [App\Http\Controllers\Odontologo\PrescripcionController::class, 'destroy'])->name('odontologo.prescripciones.destroy');
 
+// =========================
+    // RUTAS DE REPORTES
+    // =========================
+    Route::prefix('reportes')->group(function () {
+        Route::get('/', [App\Http\Controllers\Odontologo\ReporteController::class, 'index'])
+            ->name('odontologo.reportes.index');
+        Route::get('/pacientes', [App\Http\Controllers\Odontologo\ReporteController::class, 'pacientes'])
+            ->name('odontologo.reportes.pacientes');
+            // ya dentro del Route::prefix('reportes')->group(function () { ... });
+        Route::get('/pacientes/pdf', [App\Http\Controllers\Odontologo\ReporteController::class, 'pacientesPdf'])
+            ->name('odontologo.reportes.pacientes.pdf');
 
+        Route::get('/citas', [App\Http\Controllers\Odontologo\ReporteController::class, 'citas'])
+            ->name('odontologo.reportes.citas');
+            // Ruta para exportar PDF de citas
+        Route::get('/citas/pdf', [App\Http\Controllers\Odontologo\ReporteController::class, 'citasPdf'])
+            ->name('odontologo.reportes.citas.pdf');
+
+        Route::get('/horarios', [App\Http\Controllers\Odontologo\ReporteController::class, 'horarios'])
+            ->name('odontologo.reportes.horarios');
+            
+        Route::get('/horarios/pdf', [App\Http\Controllers\Odontologo\ReporteController::class, 'horariosPdf'])
+            ->name('odontologo.reportes.horarios.pdf');
+
+        Route::get('/servicios', [App\Http\Controllers\Odontologo\ReporteController::class, 'servicios'])
+            ->name('odontologo.reportes.servicios');
+        Route::get('/servicios/pdf', [App\Http\Controllers\Odontologo\ReporteController::class, 'serviciosPdf'])
+        ->name('odontologo.reportes.servicios.pdf');
+        
+        Route::get('/historialesmedicos', [App\Http\Controllers\Odontologo\ReporteController::class, 'historialesMedicos'])
+            ->name('odontologo.reportes.historialesmedicos');
+        Route::get('/historialesmedicos/pdf', [App\Http\Controllers\Odontologo\ReporteController::class, 'historialesMedicosPdf'])
+            ->name('odontologo.reportes.historialesmedicos.pdf');
+
+        Route::get('/medicamentos', [App\Http\Controllers\Odontologo\ReporteController::class, 'medicamentos'])
+            ->name('odontologo.reportes.medicamentos');
+        Route::get('/medicamentos/pdf', [App\Http\Controllers\Odontologo\ReporteController::class, 'medicamentosPdf'])
+            ->name('odontologo.reportes.medicamentos.pdf');
+    });
 
 
 
 });
 
-
 // Ruta API para obtener todos los horarios (para uso interno o AJAX)
 Route::get('/horarios', [App\Http\Controllers\HorarioController::class, 'apiHorarios']);
+
+//API GOGOLE LOGIN
+Route::get('auth/google', function () {
+    return Socialite::driver('google')->redirect();
+})->name('google.login');
+
+
+
+// Ruta: auth/google/callback
+Route::get('auth/google/callback', function () {
+    try {
+        $googleUser = Socialite::driver('google')->user();
+
+        // Buscar si el usuario ya existe en la base de datos
+        $user = User::where('email', $googleUser->getEmail())->first();
+
+        // Si no existe, crearlo automáticamente como Usuario
+        if (!$user) {
+            $user = User::create([
+                'name' => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
+                'password' => bcrypt(uniqid()), // contraseña aleatoria
+            ]);
+
+            // Asignar rol Usuario, no Paciente todavía
+            $user->assignRole('Usuario');
+        }
+
+        // Iniciar sesión del usuario
+        Auth::login($user);
+
+        // Redirigir según rol
+        if ($user->hasRole('Usuario')) {
+            return redirect()->route('usuario.index'); // Portal front usuario
+        }
+
+        if ($user->hasRole('Paciente')) {
+            return redirect()->route('usuario.index'); // Front panel paciente
+        }
+
+        if ($user->hasRole('Odontologo')) {
+            return redirect()->route('odontologo.index'); // Panel odontólogo
+        }
+
+        if ($user->hasRole('Administrador')) {
+            return redirect()->route('admin.dashboard'); // Panel admin
+        }
+
+        // Rol por defecto
+        return redirect()->route('usuario.index');
+
+    } catch (Exception $e) {
+        return redirect('/login')->with('error', 'Error al iniciar sesión con Google.');
+    }
+});
+
 
 
 

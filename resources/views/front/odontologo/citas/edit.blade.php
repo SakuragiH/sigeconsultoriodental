@@ -119,6 +119,7 @@
                             <option value="Pendiente" {{ $cita->estado == 'Pendiente' ? 'selected' : '' }}>Pendiente</option>
                             <option value="Confirmada" {{ $cita->estado == 'Confirmada' ? 'selected' : '' }}>Confirmada</option>
                             <option value="Cancelada" {{ $cita->estado == 'Cancelada' ? 'selected' : '' }}>Cancelada</option>
+                            <option value="Realizada" {{ $cita->estado == 'Realizada' ? 'selected' : '' }}>Realizada</option>
                         </select>
                         @error('estado')
                             <small class="text-danger">{{ $message }}</small>

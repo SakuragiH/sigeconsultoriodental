@@ -12,6 +12,7 @@
             <i class="fas fa-plus-circle"></i> Nuevo Paciente
         </a>
     </div>
+    
 
     @if($pacientes->isEmpty())
         <div class="alert alert-info text-center">
@@ -68,8 +69,8 @@
                                 </a>
 
                                 <form action="{{ route('odontologo.pacientes.destroy', $paciente->id) }}" 
-                                      method="POST" 
-                                      class="d-inline form-eliminar">
+                                    method="POST" 
+                                    class="d-inline form-eliminar">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" 
@@ -88,30 +89,55 @@
     @endif
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const botones = document.querySelectorAll('.btn-eliminar');
-
-    botones.forEach(button => {
-        button.addEventListener('click', function() {
+    document.querySelectorAll('.btn-eliminar').forEach(btn => {
+        btn.addEventListener('click', function() {
             const form = this.closest('form');
             Swal.fire({
                 title: '¿Estás seguro?',
                 text: "¡No podrás revertir esto!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#12403B',
-                cancelButtonColor: '#5DA6A6',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    form.submit();
+                    form.submit(); // aquí se envía el DELETE
                 }
             });
         });
     });
-});
 </script>
 @endsection
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    $('.table').DataTable({
+        "pageLength": 5,
+        "language": {
+            "emptyTable": "No hay información",
+            "info": "Mostrando _START_ a _END_ de _TOTAL_ pacientes",
+            "infoEmpty": "Mostrando 0 a 0 de 0 pacientes",
+            "infoFiltered": "(Filtrado de _MAX_ total pacientes)",
+            "lengthMenu": "<b>Mostrar _MENU_ Pacientes</b>",
+            "loadingRecords": "Cargando...",
+            "processing": "Procesando...",
+            "search": "Buscador:",
+            "zeroRecords": "Sin resultados encontrados",
+            "paginate": {
+                "first": "Primero",
+                "last": "Último",
+                "next": "Siguiente",
+                "previous": "Anterior"
+            }
+        }
+    });
+});
+</script>
+@endpush
+

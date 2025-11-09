@@ -32,4 +32,11 @@ class HistorialMedico extends Model
     {
         return $this->belongsTo(Cita::class);
     }
+
+    // En HistorialMedico.php
+    public function prescripciones() 
+    {
+    return $this->hasMany(Prescripcion::class, 'historial_id');
+    }
+
 }

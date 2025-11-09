@@ -15,8 +15,31 @@ class OdontologoFrontController extends Controller
     // Dashboard principal del odontólogo
     public function index()
     {
-        $user = Auth::user(); // Obtiene el odontólogo logueado
-        return view('front.odontologo.index', compact('user'));
+        $user = Auth::user();
+$odontologoId = $user->odontologo->id;
+
+$citas = Cita::with(['paciente', 'servicio', 'horario'])
+    ->where('odontologo_id', $odontologoId)
+    ->orderBy('horario_id', 'asc')
+    ->get();
+
+$events = $citas->map(function($cita) {
+    return [
+        'title' => $cita->servicio->nombre ?? 'Servicio',
+        'start' => $cita->horario->fecha . 'T' . $cita->horario->hora_inicio,
+        'end'   => $cita->horario->fecha . 'T' . $cita->horario->hora_fin,
+        'extendedProps' => [
+            'paciente' => $cita->paciente->nombres . ' ' . $cita->paciente->apellidos,
+            'odontologo' => $cita->odontologo->nombres . ' ' . $cita->odontologo->apellidos,
+            'motivo' => $cita->motivo ?? '',
+            'observaciones' => $cita->observaciones ?? '',
+            'estado' => $cita->estado,
+        ],
+    ];
+});
+
+return view('front.odontologo.index', compact('user', 'events', 'citas'));
+
 
     }
 
@@ -97,55 +120,66 @@ if ($request->hasFile('foto')) {
     // Mostrar formulario para crear horario
     public function create()
     {
-        return view('front.odontologo.horarios.create');
+         $horario = null; // Para que el blade no marque error
+            return view('front.odontologo.horarios.create', compact('horario'));
     }
 
+
+    // Guardar nuevo horario
     public function guardarHorarios(Request $request)
     {
           $request->validate([
-        'fecha' => 'required|date',
+        'fecha_inicio' => 'required|date',
+        'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
         'hora_inicio' => 'required',
         'hora_fin' => 'required|after:hora_inicio',
+        'dias' => 'required|array|min:1',
     ]);
 
     $odontologo_id = Auth::user()->odontologo->id;
 
+    $fechaInicio = Carbon::parse($request->fecha_inicio);
+    $fechaFin = Carbon::parse($request->fecha_fin);
     $horaInicio = Carbon::parse($request->hora_inicio);
     $horaFin = Carbon::parse($request->hora_fin);
 
-    // Evitar duplicados en toda la franja
-    $existe = Horario::where('odontologo_id', $odontologo_id)
-        ->where('fecha', $request->fecha)
-        ->where(function($q) use ($horaInicio, $horaFin) {
-            $q->whereBetween('hora_inicio', [$horaInicio->format('H:i'), $horaFin->format('H:i')])
-              ->orWhereBetween('hora_fin', [$horaInicio->format('H:i'), $horaFin->format('H:i')]);
-        })->exists();
+    // Generamos horarios por rango
+    for ($fecha = $fechaInicio->copy(); $fecha->lte($fechaFin); $fecha->addDay()) {
+        $diaSemana = ucfirst($fecha->translatedFormat('l')); // Ej: Lunes, Martes...
 
-    if ($existe) {
-        return redirect()->back()->with('error', 'Ya existe un horario en ese rango de tiempo.');
-    }
+        if (in_array($diaSemana, $request->dias)) {
 
-    // Crear bloques de 1 hora
-    $current = $horaInicio;
-    while ($current->lt($horaFin)) {
-        $endBlock = $current->copy()->addHour();
-        if ($endBlock->gt($horaFin)) {
-            $endBlock = $horaFin->copy();
+            // Generar bloques de una hora
+            $current = $horaInicio->copy();
+            while ($current->lt($horaFin)) {
+                $endBlock = $current->copy()->addHour();
+                if ($endBlock->gt($horaFin)) $endBlock = $horaFin->copy();
+
+                // Verificamos duplicados solo por bloque
+                $bloqueExiste = Horario::where('odontologo_id', $odontologo_id)
+                    ->where('fecha', $fecha->toDateString())
+                    ->where('hora_inicio', $current->format('H:i'))
+                    ->where('hora_fin', $endBlock->format('H:i'))
+                    ->exists();
+
+                if (!$bloqueExiste) {
+                    Horario::create([
+                        'odontologo_id' => $odontologo_id,
+                        'dia' => $diaSemana,
+                        'fecha' => $fecha->toDateString(),
+                        'hora_inicio' => $current->format('H:i'),
+                        'hora_fin' => $endBlock->format('H:i'),
+                        'disponible' => true,
+                    ]);
+                }
+
+                $current->addHour();
+            }
         }
-
-        Horario::create([
-            'odontologo_id' => $odontologo_id,
-            'dia' => Carbon::parse($request->fecha)->locale('es')->dayName,
-            'fecha' => $request->fecha,
-            'hora_inicio' => $current->format('H:i'),
-            'hora_fin' => $endBlock->format('H:i'),
-            'disponible' => true,
-        ]);
-
-        $current->addHour();
     }
 
-    return redirect()->route('odontologo.horarios')->with('success', 'Horario creado correctamente.');
+    return redirect()->route('odontologo.horarios')
+                     ->with('success', 'Horarios recurrentes creados correctamente.');
     }
 
      // Mostrar formulario para editar
@@ -162,18 +196,31 @@ if ($request->hasFile('foto')) {
         'fecha' => 'required|date',
         'hora_inicio' => 'required',
         'hora_fin' => 'required|after:hora_inicio',
+        'disponible' => 'required|boolean',
     ]);
 
     $horario = Horario::findOrFail($id);
     $odontologo_id = $horario->odontologo_id;
 
+    // Si solo cambia la disponibilidad, actualizar y salir
+    if ($request->fecha == $horario->fecha &&
+        $request->hora_inicio == $horario->hora_inicio &&
+        $request->hora_fin == $horario->hora_fin) {
+
+        $horario->disponible = $request->disponible;
+        $horario->save();
+
+        return redirect()->route('odontologo.horarios')
+                         ->with('success', 'Horario actualizado correctamente.');
+    }
+
+    // Validar duplicados si cambia fecha/hora
     $horaInicio = Carbon::parse($request->hora_inicio);
     $horaFin = Carbon::parse($request->hora_fin);
 
-    // Evitar duplicados al actualizar (excepto el horario actual)
     $existe = Horario::where('odontologo_id', $odontologo_id)
         ->where('fecha', $request->fecha)
-        ->where('id', '!=', $id)
+        ->where('id', '!=', $horario->id)
         ->where(function($q) use ($horaInicio, $horaFin) {
             $q->whereBetween('hora_inicio', [$horaInicio->format('H:i'), $horaFin->format('H:i')])
               ->orWhereBetween('hora_fin', [$horaInicio->format('H:i'), $horaFin->format('H:i')]);
@@ -183,21 +230,18 @@ if ($request->hasFile('foto')) {
         return redirect()->back()->with('error', 'Ya existe un horario en ese rango de tiempo.');
     }
 
-    // Eliminar solo los bloques libres existentes de este horario
+    // Eliminar bloques libres antiguos
     Horario::where('odontologo_id', $odontologo_id)
            ->where('fecha', $horario->fecha)
            ->where('disponible', true)
            ->delete();
 
-    // Crear nuevos bloques de 1 hora según el rango nuevo
+    // Crear nuevos bloques según rango de hora
     $current = $horaInicio;
     while ($current->lt($horaFin)) {
         $endBlock = $current->copy()->addHour();
-        if ($endBlock->gt($horaFin)) {
-            $endBlock = $horaFin->copy();
-        }
+        if ($endBlock->gt($horaFin)) $endBlock = $horaFin->copy();
 
-        // Verificamos si ya existe un bloque reservado para esa hora
         $existeBloque = Horario::where('odontologo_id', $odontologo_id)
             ->where('fecha', $request->fecha)
             ->where('hora_inicio', $current->format('H:i'))
@@ -211,14 +255,15 @@ if ($request->hasFile('foto')) {
                 'fecha' => $request->fecha,
                 'hora_inicio' => $current->format('H:i'),
                 'hora_fin' => $endBlock->format('H:i'),
-                'disponible' => true,
+                'disponible' => $request->disponible,
             ]);
         }
 
         $current->addHour();
     }
 
-    return redirect()->route('odontologo.horarios')->with('success', 'Horario actualizado correctamente.');
+    return redirect()->route('odontologo.horarios')
+                     ->with('success', 'Horario actualizado correctamente.');
     }
 
     // Eliminar horario

@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
+    'logo' => '<b>Alcala\'s</b>Dent',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
@@ -309,52 +309,46 @@ return [
         [
             'text' => 'Medicamentos',
             'url'  => 'admin/medicamentos',
-            'icon' => 'fas fa-pills', // Nuevo ícono
-            'classes' => 'bg-success text-white', // Nuevo color de fondo y texto
+            'icon' => 'fas fa-pills',
+            'classes' => 'bg-info text-white', // Azul petróleo aproximado
         ],
         [
             'text' => 'Citas',
             'url'  => 'admin/citas',
-            'icon' => 'fas fa-calendar-check', // Nuevo ícono
-            'classes' => 'bg-success text-white', // Nuevo color de fondo y texto
+            'icon' => 'fas fa-calendar-check',
+            'classes' => 'bg-info text-white', // Verde agua aproximado
         ],
         [
             'text' => 'Horarios',
             'url'  => 'admin/horarios',
-            'icon' => 'fas fa-clock', // Nuevo ícono
-            'classes' => 'bg-success text-white', // Nuevo color de fondo y texto
+            'icon' => 'fas fa-clock',
+            'classes' => 'bg-info text-white', // Verde agua aproximado
         ],
-
         [
             'text' => 'Servicios',
             'url'  => 'admin/servicios',
-            'icon' => 'fas fa-concierge-bell', // Nuevo ícono
-            'classes' => 'bg-success text-white', // Nuevo color de fondo y texto
+            'icon' => 'fas fa-concierge-bell',
+            'classes' => 'bg-info text-white', // Azul petróleo aproximado
         ],
-
         [
             'text' => 'Historial Medico',
             'url'  => 'admin/historialesmedicos',
-            'icon' => 'fas fa-notes-medical', // Nuevo ícono
-            'classes' => 'bg-success text-white', // Nuevo color de fondo y texto
+            'icon' => 'fas fa-notes-medical',
+            'classes' => 'bg-info text-white', // Verde oscuro aproximado
         ],
-
         [
             'text' => 'Prescripciones',
             'url'  => 'admin/prescripciones',
-            'icon' => 'fas fa-file-prescription', // Nuevo ícono
-            'classes' => 'bg-success text-white', // Nuevo color de fondo y texto
+            'icon' => 'fas fa-file-prescription',
+            'classes' => 'bg-info text-white', // Azul muy oscuro aproximado
         ],
-        
 
-        
-        
         ['header' => 'Datos'],
 
         [
             'text' => 'Roles',
             'icon' => 'fas fa-fw fa-user',
-            'classes' => 'bg-blue text-white',
+            'classes' => 'bg-info text-white', // Azul petróleo aproximado
             'submenu' =>[
                 [
                     'text' => 'Lista de Roles',
@@ -365,18 +359,19 @@ return [
         ],
 
         [
-                'text' => 'Odontologos',
-                'url'  => 'admin/odontologos',
-                'icon' => 'fas fa-user-md', // icono cambiado
-                'classes' => 'bg-blue text-white',
+            'text' => 'Odontologos',
+            'url'  => 'admin/odontologos',
+            'icon' => 'fas fa-user-md',
+            'classes' => 'bg-info text-white', // Verde agua aproximado
         ],
 
         [
             'text' => 'Pacientes',
             'url'  => 'admin/pacientes',
             'icon' => 'fas fa-tooth',
-            'classes' => 'bg-blue text-white',
+            'classes' => 'bg-info text-white', // Azul petróleo aproximado
         ],
+
         
 
         

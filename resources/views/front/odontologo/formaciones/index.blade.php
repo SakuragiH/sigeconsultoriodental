@@ -26,14 +26,15 @@
                     
                     @php
                         $ext = pathinfo($formacion->archivo, PATHINFO_EXTENSION);
+                        $archivoUrl = asset('storage/' . $formacion->archivo);
                     @endphp
 
                     @if(in_array(strtolower($ext), ['jpg','jpeg','png','gif']))
-                        <img src="{{ asset('uploads/formaciones/'.$formacion->archivo) }}" alt="Formación">
+                        <img src="{{ $archivoUrl }}" alt="Formación" style="max-width:100%; height:auto;">
                     @elseif(strtolower($ext) === 'pdf')
-                        <embed src="{{ asset('uploads/formaciones/'.$formacion->archivo) }}" type="application/pdf" width="100%" height="200px">
+                        <embed src="{{ $archivoUrl }}" type="application/pdf" width="100%" height="200px">
                     @else
-                        <p>Archivo: {{ $formacion->archivo }}</p>
+                        <p>Archivo: <a href="{{ $archivoUrl }}" target="_blank">{{ $formacion->archivo }}</a></p>
                     @endif
 
                     <form action="{{ route('odontologo.formaciones.destroy', $formacion->id) }}" method="POST" onsubmit="return confirm('¿Deseas eliminar esta formación?');">

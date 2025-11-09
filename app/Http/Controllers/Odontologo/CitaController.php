@@ -121,7 +121,7 @@ public function index()
         'horario_id'    => 'required|exists:horarios,id',
         'motivo'        => 'nullable|string',
         'observaciones' => 'nullable|string',
-        'estado'        => 'nullable|in:Pendiente,Confirmada,Cancelada',
+        'estado'        => 'nullable|in:Pendiente,Confirmada,Cancelada,Realizada',
     ]);
 
     $odontologoId = Auth::user()->odontologo->id;

@@ -8,6 +8,8 @@ use App\Models\Paciente;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Prescripcion;
+
 
 class UsuarioFrontController extends Controller
 {
@@ -180,62 +182,150 @@ public function crearCita()
 }
 
 
- public function horariosDisponibles($odontologoId)
+    public function horariosDisponibles(Request $request, $odontologoId)
     {
-         $horarios = Horario::where('odontologo_id', $odontologoId)
+        $hoy = Carbon::today();
+    $filtro = $request->get('filtro', 'semana_actual');
+
+    switch($filtro) {
+        case 'hoy':
+            $fechaInicio = $hoy;
+            $fechaFin = $hoy;
+            break;
+        case 'manana':
+            $fechaInicio = $hoy->copy()->addDay();
+            $fechaFin = $fechaInicio;
+            break;
+        case 'semana_actual':
+            $fechaInicio = $hoy->copy()->startOfWeek();
+            $fechaFin = $hoy->copy()->endOfWeek();
+            break;
+        case 'semana_siguiente':
+            $fechaInicio = $hoy->copy()->addWeek()->startOfWeek();
+            $fechaFin = $hoy->copy()->addWeek()->endOfWeek();
+            break;
+        case 'este_mes':
+            $fechaInicio = $hoy->copy()->startOfMonth();
+            $fechaFin = $hoy->copy()->endOfMonth();
+            break;
+        case 'proximo_mes':
+            $fechaInicio = $hoy->copy()->addMonth()->startOfMonth();
+            $fechaFin = $hoy->copy()->addMonth()->endOfMonth();
+            break;
+        default:
+            $fechaInicio = $hoy;
+            $fechaFin = $hoy->copy()->addWeeks(2);
+    }
+
+    $horarios = Horario::where('odontologo_id', $odontologoId)
         ->where('disponible', true)
+        ->whereBetween('fecha', [$fechaInicio, $fechaFin])
         ->whereDoesntHave('citas')
         ->orderBy('fecha')
         ->orderBy('hora_inicio')
-        ->get(['id', 'fecha', 'hora_inicio', 'hora_fin']); // agregamos fecha
+        ->get();
 
-    $horarios->transform(function($h) {
-        $fecha = Carbon::parse($h->fecha);
-        $h->dia = ucfirst($fecha->translatedFormat('l')); // lunes, martes, etc.
-        $h->fecha_formateada = $fecha->format('d/m/Y');
-        return $h;
-    });
+    $agrupados = $horarios->groupBy('fecha')->map(function ($bloques, $fecha) {
+        $fechaCarbon = Carbon::parse($fecha);
+        return [
+            'fecha' => $fechaCarbon->format('d/m/Y'),
+            'dia' => ucfirst($fechaCarbon->translatedFormat('l')),
+            'bloques' => $bloques->map(function ($h) {
+                return [
+                    'id' => $h->id,
+                    'hora_inicio' => Carbon::parse($h->hora_inicio)->format('h:i A'),
+                    'hora_fin' => Carbon::parse($h->hora_fin)->format('h:i A')
+                ];
+            })
 
-    return response()->json($horarios);
-    }
+        ];
+    })->values();
 
-
-    // Mostrar detalles de una cita específica
-    public function mostrarCita($id)
-    {
-    $user = Auth::user();
-    $cita = $user->paciente->citas()->with('odontologo', 'servicio', 'horario')->findOrFail($id);
-
-    return view('front.usuario.citas.show', compact('cita'));
+    return response()->json($agrupados);
     }
 
 
     // Listar todas las citas del usuario
     public function misCitas()
     {
-    $user = Auth::user();
+     $user = Auth::user();
 
-    // Tomamos solo las citas activas del paciente
-    $citas = $user->paciente->citas()->with(['servicio', 'odontologo', 'horario'])->get();
-
-    // Transformamos para FullCalendar
-    $events = $citas->map(function($cita){
-        return [
-            'title' => $cita->servicio->nombre ?? 'Cita',
-            'start' => $cita->horario->fecha . 'T' . $cita->horario->hora_inicio,
-            'end'   => $cita->horario->fecha . 'T' . $cita->horario->hora_fin,
-            'color' => $cita->estado == 'Pendiente' ? 'orange' : ($cita->estado == 'Confirmada' ? 'green' : 'red'),
-            'extendedProps' => [
-                'odontologo' => $cita->odontologo->nombres . ' ' . $cita->odontologo->apellidos,
-                'motivo' => $cita->motivo,
-                'observaciones' => $cita->observaciones,
-            ]
-        ];
-    });
-
-    return view('front.usuario.citas.index', compact('user','events'));
+    // Si el usuario aún no es paciente
+    if (!$user->paciente) {
+        $events = collect(); // calendario vacío
+        $noPaciente = true;
+    } else {
+        $citas = $user->paciente->citas()->with(['servicio', 'odontologo', 'horario'])->get();
+        $events = $citas->map(function($cita){
+            return [
+                'title' => $cita->servicio->nombre ?? 'Cita',
+                'start' => $cita->horario->fecha . 'T' . $cita->horario->hora_inicio,
+                'end'   => $cita->horario->fecha . 'T' . $cita->horario->hora_fin,
+                'color' => $cita->estado == 'Pendiente' ? 'orange' : ($cita->estado == 'Confirmada' ? 'green' : 'red'),
+                'extendedProps' => [
+                    'odontologo' => $cita->odontologo->nombres . ' ' . $cita->odontologo->apellidos,
+                    'motivo' => $cita->motivo,
+                    'observaciones' => $cita->observaciones,
+                ]
+            ];
+        });
+        $noPaciente = false;
     }
 
+    return view('front.usuario.citas.index', compact('user', 'events', 'noPaciente'));
+    }
+
+    /**
+     * Mostrar las prescripciones del paciente logueado
+     */
+    public function prescripciones()
+    {
+        $user = Auth::user();
+    $paciente = $user->paciente;
+
+    if (!$paciente) {
+        $prescripciones = collect();
+        $info = 'No se encontraron prescripciones porque aún no eres paciente.';
+        return view('front.usuario.prescripciones.index', compact('prescripciones', 'info'));
+    }
+
+    // Obtener todas las prescripciones a través de los historiales médicos
+    $prescripciones = $paciente->historialesMedicos()
+        ->with('prescripciones.medicamento')
+        ->get()
+        ->pluck('prescripciones')
+        ->flatten();
+
+    if ($prescripciones->isEmpty()) {
+        $info = 'Aún no tienes prescripciones.';
+        return view('front.usuario.prescripciones.index', compact('prescripciones', 'info'));
+    }
+
+    return view('front.usuario.prescripciones.index', compact('prescripciones'));
+    }
+
+    /**
+     * Descargar prescripción en PDF
+     */
+    public function descargarPrescripcion(Prescripcion $prescripcion)
+    {
+         $user = Auth::user();
+    $paciente = $user->paciente;
+
+    if (!$paciente) {
+        abort(403, 'No tienes permiso para descargar esta prescripción.');
+    }
+
+    // Cargar IDs de historiales médicos del paciente
+    $historialesIds = $paciente->historialesMedicos()->pluck('id');
+
+    if (!$historialesIds->contains($prescripcion->historial_id)) {
+        abort(403, 'No tienes permiso para descargar esta prescripción.');
+    }
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('front.usuario.prescripciones.pdf', compact('prescripcion'));
+    return $pdf->download("Prescripcion_{$prescripcion->id}.pdf");
+    }
 
 
 

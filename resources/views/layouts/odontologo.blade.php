@@ -20,10 +20,18 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <!-- jQuery (debe ir antes que app.js) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
     <!-- Scripts Vite -->
     @vite(['resources/sass/app.scss','resources/js/app.js'])
 
-    <!-- Stack para estilos adicionales -->
     @stack('styles')
 </head>
 <body>
@@ -69,16 +77,22 @@
                     <span>Prescripciones</span>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('odontologo.reportes.*') ? 'active' : '' }}">
+                <a href="{{ route('odontologo.reportes.index') }}">
+                    <i class="fas fa-chart-bar"></i> {{-- ícono representativo de reportes --}}
+                    <span>Reportes</span>
+                </a>
+            </li>
         </ul>
     </aside>
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Topbar -->
-        <div class="topbar">
-            <h1 class="welcome-text">Bienvenido, Dr. {{ Auth::user()->name }}</h1>
+        <!-- Topbar / Header dinámico -->
+        <header class="topbar">
+            <h2 id="module-title">Inicio</h2>
             <button id="btn-logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Salir</button>
-        </div>
+        </header>
 
         <!-- Modal logout -->
         <div id="logout-modal" class="modal">
@@ -110,6 +124,31 @@
         window.addEventListener('click', (e) => { if(e.target === modal) modal.style.display = 'none'; });
     </script>
 
+    <!-- Header dinámico según ruta -->
+    <script>
+        const routeName = "{{ Route::currentRouteName() }}";
+        const moduleTitle = document.getElementById('module-title');
+        const titles = {
+            'odontologo.index': 'Inicio',
+            'odontologo.perfil': 'Perfil',
+            'odontologo.pacientes.index': 'Pacientes',
+            'odontologo.horarios': 'Horarios',
+            'odontologo.citas.index': 'Citas',
+            'odontologo.servicios.index': 'Servicios',
+            'odontologo.historialesmedicos.index': 'Historiales de Pacientes',
+            'odontologo.medicamentos.index': 'Medicamentos',
+            'odontologo.prescripciones.index': 'Prescripciones',
+            'odontologo.reportes.index': 'Reportes',
+            'odontologo.reportes.pacientes': 'Pacientes',
+            'odontologo.reportes.citas': 'Citas',
+            'odontologo.reportes.servicios': 'Servicios',
+            'odontologo.reportes.horarios': 'Horarios',
+            'odontologo.reportes.medicamentos': 'Medicamentos',
+            'odontologo.reportes.historialesmedicos': 'Historiales de Pacientes',
+        };
+        if(titles[routeName]) moduleTitle.textContent = titles[routeName];
+    </script>
+
     <!-- SweetAlert2 global -->
     <script>
         document.querySelectorAll('.form-delete').forEach(form => {
@@ -125,9 +164,7 @@
                     confirmButtonText: 'Sí, eliminar',
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
-                    if(result.isConfirmed){
-                        form.submit();
-                    }
+                    if(result.isConfirmed) form.submit();
                 });
             });
         });
@@ -151,7 +188,6 @@
         @endif
     </script>
 
-    <!-- Stack para scripts adicionales -->
     @stack('scripts')
 </body>
 </html>

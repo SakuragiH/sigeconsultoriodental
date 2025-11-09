@@ -53,7 +53,7 @@
                             </td>
                             <td style="text-align: center">
                                 @if($odontologo->foto)
-                                    <img src="{{ url($odontologo->foto) }}" width="50" height="50" class="rounded-circle" alt="Foto">
+                                    <img src="{{ asset('storage/odontologos/'.$odontologo->foto) }}" width="50" height="50" class="rounded-circle" alt="Foto">
                                 @else
                                     <span class="text-muted">Sin foto</span>
                                 @endif
